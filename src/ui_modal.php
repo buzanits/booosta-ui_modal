@@ -38,13 +38,15 @@ class UI_Modal extends \booosta\ui\UI
     $code = '';
 
     if($this->auto_open && method_exists($this->parentobj, 'add_jquery_ready')) 
-      $this->parentobj->add_jquery_ready("\$('[data-remodal-id=remodal-$this->id]').remodal().open();");
+      $this->parentobj->add_jquery_ready("var confirmed=0; \$('[data-remodal-id=remodal-$this->id]').remodal().open();");
 
-    if(method_exists($this->parentobj, 'add_jquery_ready')) 
-      $this->parentobj->add_jquery_ready("\$(document).on('closed', '.remodal', function(e) { $this->on_cancellation }); ");
+    if(method_exists($this->parentobj, 'add_jquery_ready')): 
+      $this->parentobj->add_jquery_ready("\$(document).on('cancellation', '.remodal', function(e) { $this->on_cancellation }); ");
+      $this->parentobj->add_jquery_ready("\$(document).on('closed', '.remodal', function(e) { if(confirmed==1) return; $this->on_cancellation }); ");
+    endif;
 
     if($this->on_confirmation && method_exists($this->parentobj, 'add_jquery_ready'))
-      $this->parentobj->add_jquery_ready("\$(document).on('confirmation', '.remodal', function() { $this->on_confirmation; }); ");
+      $this->parentobj->add_jquery_ready("\$(document).on('confirmation', '.remodal', function() { confirmed=1; $this->on_confirmation; }); ");
 
     return $code;
   }
